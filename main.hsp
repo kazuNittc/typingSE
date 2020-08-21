@@ -1,18 +1,47 @@
-#include "KeyHook.hsp"
+// modules
+    #include "KeyHook.hsp"
 
-screen 0, 640, 480, 0
+// pre-process
+    randomize
     khHook *onKeyHook
     if (stat == 0) {
         dialog "failed hook"
         end
     }
+    chdir "sounds"
+    dirlist sndFiles, "*.wav", 0
+    if (stat == 0) {
+        dialog "no sound files exist"
+        end
+    }
+    notesel sndFiles
+    repeat notemax
+        noteget buf, cnt
+        mci "open \"" + buf + "\""
+    loop
+
+// screens
+    screen 0, 640, 480, screen_hide
+
+// display process
+    gsel 0, 1
     stop
 
+// labels
 *onKeyHook
+    if (khStat == 0) {
+        rndNum = rnd(notemax)
+        noteget buf, rndNum
+        mci "play \"" + buf + "\" from 0"
+    }
+    
     redraw 0
         color 0xff, 0xff, 0xff
-        boxf
+            boxf
         color : pos 0, 0
-        mes "Code:"+ khKeyCode + " Name:" +khKeyName + " Stat:" +  khStat
+            mes "Code: "+ khKeyCode + " Name: " +khKeyName + " Stat: " +  khStat
+        pos 0, 20
+            mes "play: "+ rndNum + ".wav"
     redraw 1
+    
     return 0
