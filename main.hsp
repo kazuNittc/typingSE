@@ -1,1 +1,18 @@
+#include "KeyHook.hsp"
+
 screen 0, 640, 480, 0
+    khHook *onKeyHook
+    if (stat == 0) {
+        dialog "failed hook"
+        end
+    }
+    stop
+
+*onKeyHook
+    redraw 0
+        color 0xff, 0xff, 0xff
+        boxf
+        color : pos 0, 0
+        mes "Code:"+ khKeyCode + " Name:" +khKeyName + " Stat:" +  khStat
+    redraw 1
+    return 0
