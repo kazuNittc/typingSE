@@ -1,8 +1,10 @@
 // modules
     #include "KeyHook.hsp"
+    #include "dsoundex.as"
 
 // pre-process
     randomize
+    rndNum = 0
     khHook *onKeyHook
     if (stat == 0) {
         dialog "failed hook"
@@ -14,10 +16,15 @@
         dialog "no sound files exist"
         end
     }
+    ds_init
     notesel sndFiles
     repeat notemax
         noteget buf, cnt
-        mci "open \"" + buf + "\""
+        ds_load buf, cnt
+        if (stat == 0) {
+            dialog "can't open sound file"
+            end
+        }
     loop
 
 // screens
@@ -30,9 +37,16 @@
 // labels
 *onKeyHook
     if (khStat == 0) {
-        rndNum = rnd(notemax)
-        noteget buf, rndNum
-        mci "play \"" + buf + "\" from 0"
+        expt = rndNum
+        dim ar, notemax-1
+        st = 0
+        foreach ar
+            if (st == expt) { st++ }
+            ar(cnt) = st
+            st++
+        loop
+        rndNum = ar(rnd(notemax-1))
+        ds_play rndNum, 0
     }
     
     redraw 0
@@ -42,6 +56,8 @@
             mes "Code: "+ khKeyCode + " Name: " +khKeyName + " Stat: " +  khStat
         pos 0, 20
             mes "play: "+ rndNum + ".wav"
+        pos 0, 40
+            mes "expt: " + expt
     redraw 1
     
     return 0
