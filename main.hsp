@@ -5,7 +5,8 @@
 // pre-process
     randomize
     rndNum = 0
-    khHook *onKeyHook
+    dim pushFlg, 0xff
+    khHookLL *onKeyHook
     if (stat == 0) {
         dialog "failed hook"
         end
@@ -36,7 +37,7 @@
 
 // labels
 *onKeyHook
-    if (khStat == 0) {
+    if ((khStat == 0) & (pushFlg(khKeyCode) == 0)) {
         expt = rndNum
         dim ar, notemax-1
         st = 0
@@ -46,7 +47,11 @@
             st++
         loop
         rndNum = ar(rnd(notemax-1))
+        pushFlg(khKeyCode) = 1
         ds_play rndNum, 0
+    }
+    if ((khStat == 2) & (pushFlg(khKeyCode) == 1)) {
+        pushFlg(khKeyCode) = 0
     }
     
     redraw 0
@@ -58,6 +63,8 @@
             mes "play: "+ rndNum + ".wav"
         pos 0, 40
             mes "expt: " + expt
+        pos 0, 60
+            mes "pushFlg(" + khKeyCode + ") : " + pushFlg(khKeyCode)
     redraw 1
     
     return 0
